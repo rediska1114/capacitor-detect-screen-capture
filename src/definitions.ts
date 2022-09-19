@@ -1,3 +1,13 @@
+import { PluginListenerHandle } from '@capacitor/core';
+
 export interface DetectScreenCapturePlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  addListener(
+    eventName: 'didScreenshot',
+    listenerFunc: () => void,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
+
+  addListener(
+    eventName: 'didScreenRecording',
+    listenerFunc: () => void,
+  ): Promise<PluginListenerHandle> & PluginListenerHandle;
 }

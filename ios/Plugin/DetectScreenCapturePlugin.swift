@@ -1,5 +1,5 @@
-import Foundation
 import Capacitor
+import Foundation
 
 /**
  * Please read the Capacitor iOS Plugin Development Guide
@@ -7,12 +7,31 @@ import Capacitor
  */
 @objc(DetectScreenCapturePlugin)
 public class DetectScreenCapturePlugin: CAPPlugin {
-    private let implementation = DetectScreenCapture()
+    override public func load() {
+        super.load()
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didScreenRecording(_:)),
+            name: UIScreen.capturedDidChangeNotification,
+            object: nil
+        )
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didScreenshot(_:)),
+            name: UIApplication.userDidTakeScreenshotNotification,
+            object: nil
+        )
+    }
+
+    @objc private func didScreenshot(_: Notification) {
+        notifyListeners("didScreenshot", data: [:], retainUntilConsumed: true)
+    }
+
+    @objc private func didScreenRecording(_: Notification) {
+        if UIScreen.main.isCaptured {
+            notifyListeners("didScreenRecording", data: [:], retainUntilConsumed: true)
+        }
     }
 }
